@@ -1,8 +1,11 @@
 import {useState, ChangeEvent, FormEvent} from 'react'
 
 import {cn} from './lib/utils'
+import {toast} from 'sonner'
+
 import {Input} from '#/UI/Input'
 import {Button} from '#/UI/Button'
+import {Toaster, toasterStyles} from '#/UI/Sonner'
 
 import {X} from 'lucide-react'
 
@@ -32,8 +35,16 @@ function App() {
       const newEmbedUrl = `https://www.youtube.com/embed/${videoId}`
       setEmbedUrls((prevEmbedUrls) => [newEmbedUrl, ...prevEmbedUrls])
       setVideoUrl('')
+    } else if (url == '') {
+      toast.error(`Поле для ввода пустое`, {
+        className: toasterStyles,
+        duration: 2000,
+      })
     } else {
-      alert(`Invalid YouTube URL: ${videoUrl}`)
+      toast.error(`Неправильная ссылка: ${videoUrl}`, {
+        className: toasterStyles,
+        duration: 2000,
+      })
     }
   }
 
@@ -74,6 +85,8 @@ function App() {
           ))}
         </section>
       )}
+
+      <Toaster theme="dark" />
     </main>
   )
 }
