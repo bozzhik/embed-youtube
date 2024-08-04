@@ -18,11 +18,20 @@ function App() {
 
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const videoId = videoUrl.split('v=')[1]?.split('&')[0]
+
+    let videoId: string | null = null
+    const url = videoUrl.trim()
+
+    if (url.includes('youtube.com/watch?v=')) {
+      videoId = url.split('v=')[1]?.split('&')[0]
+    } else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0]
+    }
+
     if (videoId) {
       const newEmbedUrl = `https://www.youtube.com/embed/${videoId}`
       setEmbedUrls((prevEmbedUrls) => [newEmbedUrl, ...prevEmbedUrls])
-      setVideoUrl('') // Clear the input after adding the video
+      setVideoUrl('')
     } else {
       alert(`Invalid YouTube URL: ${videoUrl}`)
     }
@@ -46,7 +55,7 @@ function App() {
         </Button>
         {embedUrls.length > 0 && (
           <Button variant={'outline'} className="w-full mt-4" onClick={handleClearQueue}>
-            Очистить очередь видео
+            Очистить очередь
           </Button>
         )}
       </form>
