@@ -1,4 +1,5 @@
 import type {Config} from 'tailwindcss'
+import plugin from 'tailwindcss/plugin'
 
 const config = {
   darkMode: ['class'],
@@ -28,7 +29,12 @@ const config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    plugin(function sizePlugin(api) {
+      api.matchUtilities({s: (value: string) => ({width: value, height: value})}, {values: api.theme('width')})
+    }),
+    require('tailwindcss-animate'),
+  ],
 } satisfies Config
 
 export default config

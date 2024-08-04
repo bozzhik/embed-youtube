@@ -4,11 +4,13 @@ import {cn} from './lib/utils'
 import {Input} from '#/UI/Input'
 import {Button} from '#/UI/Button'
 
+import {X} from 'lucide-react'
+
 const websiteBox = 'max-w-2xl xl:max-w-xl mx-auto sm:mx-4'
 
 function App() {
   const [videoUrl, setVideoUrl] = useState<string>('')
-  const [embedUrl, setEmbedUrl] = useState<string>('')
+  const [embedUrls, setEmbedUrls] = useState<string[]>([])
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setVideoUrl(event.target.value)
@@ -18,10 +20,20 @@ function App() {
     event.preventDefault()
     const videoId = videoUrl.split('v=')[1]?.split('&')[0]
     if (videoId) {
-      setEmbedUrl(`https://www.youtube.com/embed/${videoId}`)
+      const newEmbedUrl = `https://www.youtube.com/embed/${videoId}`
+      setEmbedUrls((prevEmbedUrls) => [newEmbedUrl, ...prevEmbedUrls])
+      setVideoUrl('') // Clear the input after adding the video
     } else {
-      alert('Invalid YouTube URL')
+      alert(`Invalid YouTube URL: ${videoUrl}`)
     }
+  }
+
+  const handleClearQueue = () => {
+    setEmbedUrls([])
+  }
+
+  const handleDeleteVideo = (index: number) => {
+    setEmbedUrls((prevEmbedUrls) => prevEmbedUrls.filter((_, i) => i !== index))
   }
 
   return (
@@ -32,12 +44,25 @@ function App() {
         <Button className="w-full" type="submit">
           Добавить видео
         </Button>
+        {embedUrls.length > 0 && (
+          <Button variant={'outline'} className="w-full mt-4" onClick={handleClearQueue}>
+            Очистить очередь видео
+          </Button>
+        )}
       </form>
-      {embedUrl && (
-        <section className="space-y-4">
-          <div className="rounded-md overflow-hidden">
-            <iframe className="w-full h-full aspect-video" width="560" height="315" src={embedUrl} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title="YouTube Video"></iframe>
-          </div>
+
+      {embedUrls.length > 0 && (
+        <section className="space-y-4 mt-4">
+          {embedUrls.map((embedUrl, index) => (
+            <div key={index} className="relative group">
+              <iframe className="w-full h-full aspect-video rounded-md overflow-hidden" width="560" height="315" src={embedUrl} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen title={`YouTube Video ${index + 1}`}></iframe>
+              <div className="absolute flex flex-col justify-center top-0 right-0 h-full w-1">
+                <button className="pl-5 opacity-0 group-hover:opacity-100 duration-200" onClick={() => handleDeleteVideo(index)}>
+                  <X className="s-14 hover:stroke-neutral-400 duration-300 cursor" strokeWidth={0.7} />
+                </button>
+              </div>
+            </div>
+          ))}
         </section>
       )}
     </main>
